@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="LogicSim:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/LogicSim_jar</output-path>
+    <root id="archive" name="LogicSim.jar">
+      <element id="module-output" name="LogicSim" />
+    </root>
+  </artifact>
+</component>
