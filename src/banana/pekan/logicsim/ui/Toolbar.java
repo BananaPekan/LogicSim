@@ -16,6 +16,8 @@ public class Toolbar {
 
     int height = 60;
 
+    boolean editing = false;
+
     Window window;
 
     int lastX = 0;
@@ -41,6 +43,15 @@ public class Toolbar {
         for (int i = 0; i < Board.loadedComponents.size(); i++) {
             CustomComponent loadedComponent = Board.loadedComponents.get(i);
             addButton(window, loadedComponent.getName(), () -> {
+                if (editing) {
+                    window.nextBoard = loadedComponent.getAsBoard();
+                    Color componentColor = loadedComponent.getColor();
+                    window.red.setValue(componentColor.getRed());
+                    window.green.setValue(componentColor.getGreen());
+                    window.blue.setValue(componentColor.getBlue());
+                    window.componentNameArea.setText(loadedComponent.getName());
+                    return;
+                }
                 CustomComponent customComponent = loadedComponent.get();
                 customComponent.setX(window.getWidth() / 2);
                 customComponent.setY(window.getHeight() / 2);
@@ -83,8 +94,12 @@ public class Toolbar {
 //            button.setHeight(height);
             Color color = new Color(0x646998E6, true);
 //            Color hoverColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha() - opaque);
+
             Color hoverColor = Color.LIGHT_GRAY;
-            hoverColor = new Color(hoverColor.getRed(), hoverColor.getGreen(), hoverColor.getBlue(), (int)button.opaque);
+
+            int hoverEdit = !mouseOver ? 50 : 100;
+
+            hoverColor = new Color(hoverColor.getRed(), hoverColor.getGreen(), hoverColor.getBlue(), editing ? hoverEdit : (int)button.opaque);
 
             int opaque = (int) button.opaque;
 
@@ -190,6 +205,14 @@ public class Toolbar {
         }
 
 
+    }
+
+    public void startEdit() {
+        editing = true;
+    }
+
+    public void stopEditing() {
+        editing = false;
     }
 
     public interface ClickEvent {

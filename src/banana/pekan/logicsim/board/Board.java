@@ -1,6 +1,7 @@
 package banana.pekan.logicsim.board;
 
 import banana.pekan.logicsim.component.Component;
+import banana.pekan.logicsim.component.ComponentRegistry;
 import banana.pekan.logicsim.component.Port;
 import banana.pekan.logicsim.component.Wire;
 import banana.pekan.logicsim.component.components.CustomComponent;
@@ -71,6 +72,18 @@ public class Board implements Serializable {
         components.clear();
         inputNodes = 2;
         outputNodes = 1;
+        for (int i = 0; i < inputNodes; i++) {
+            inputPorts.add(new Port(true, i));
+        }
+        for (int i = 0; i < outputNodes; i++) {
+            outputPorts.add(new Port(false, i));
+        }
+    }
+
+    public void initializeClean() {
+        inputPorts.clear();
+        outputPorts.clear();
+        components.clear();
         for (int i = 0; i < inputNodes; i++) {
             inputPorts.add(new Port(true, i));
         }
@@ -210,6 +223,7 @@ public class Board implements Serializable {
                 CustomComponent customComponent = null;
                 if (loadedBoard != null) {
                     customComponent = new CustomComponent(componentFile.getName(), loadedBoard.getInputNodes(), loadedBoard.getOutputNodes(), loadedBoard, loadedBoard.getColor());
+
                     loadedComponents.add(customComponent);
                 }
             }

@@ -12,11 +12,10 @@ import banana.pekan.logicsim.utils.ObjectValidator;
 import javax.swing.*;
 import javax.swing.text.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.*;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Objects;
@@ -42,6 +41,8 @@ public class Window {
 
     Wire holdingWire = null;
     Component holdingComponent = null;
+
+    Board nextBoard;
 
     CopyOnWriteArrayList<Point> drawnPorts = new CopyOnWriteArrayList<>();
     ArrayList<Port> storedPorts = new ArrayList<>();
@@ -109,10 +110,19 @@ public class Window {
         frame.setBounds(0, 0, width, height);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+        ObjectValidator shouldEdit = new ObjectValidator(false, false);
 
         panel = new JPanel() {
             @Override
             public void paint(Graphics g) {
+
+                if (shouldEdit.arePositive()) {
+                    toolbar.startEdit();
+                }
+
+                if (!shouldEdit.arePositive() && shouldEdit.hasCycled()) {
+                    toolbar.stopEditing();
+                }
 
                 boolean isResizedX = !resizedWidth.doMatch();
                 boolean isResizedY = !resizedHeight.doMatch();
@@ -194,6 +204,13 @@ public class Window {
                                 int r = red.getValue();
                                 int gr = green.getValue();
                                 int b = blue.getValue();
+
+                                File componentFile = new File(componentNameArea.getText() + ".component");
+
+                                if (componentFile.exists()) {
+                                    componentFile.delete();
+                                }
+
                                 board.save(componentNameArea.getText() + ".component", r / 255f, gr / 255f, b / 255f, 1);
                             }
                             else {
@@ -228,9 +245,7 @@ public class Window {
                         drawnPorts.clear();
                         outputPorts.clear();
                     });
-                    addButton("Clear", 0, () -> {
-                        resetBoard = true;
-                    });
+                    addButton("Clear", 0, () -> resetBoard = true);
                 }
 
                 for (Component component : board.getComponents()) {
@@ -455,6 +470,23 @@ public class Window {
                 colorCheckBox.setY(toolbar.height - colorCheckBox.getWidth());
 
                 Main.board.update();
+
+                if (nextBoard != null) {
+                    Board.loadedComponents = Board.loadComponents();
+                    board.clear();
+                    drawnPorts.clear();
+                    storedPorts.clear();
+                    outputPorts.clear();
+                    togglers.clear();
+                    board.setOutputNodes(nextBoard.getOutputNodes());
+                    board.setInputNodes(nextBoard.getInputNodes());
+                    board.initializeClean();
+                    board.setComponents(nextBoard.getComponents());
+                    board.setInputPorts(nextBoard.getInputPorts());
+                    board.setOutputPorts(nextBoard.getOutputPorts());
+                    nextBoard = null;
+                }
+
             }
         };
 
@@ -672,6 +704,34 @@ public class Window {
                 lastMouseY = e.getY();
             }
 
+        });
+
+
+        panel.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
+                    shouldEdit.setA(true);
+                }
+                else if (e.getKeyCode() == KeyEvent.VK_E) {
+                    shouldEdit.setB(true);
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
+                    shouldEdit.setA(false);
+                }
+                else if (e.getKeyCode() == KeyEvent.VK_E) {
+                    shouldEdit.setB(false);
+                }
+            }
         });
 
         Dimension dim = new Dimension(width, height);

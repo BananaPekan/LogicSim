@@ -3,6 +3,7 @@ package banana.pekan.logicsim.component.components;
 import banana.pekan.logicsim.board.Board;
 import banana.pekan.logicsim.board.ComponentBoard;
 import banana.pekan.logicsim.component.Component;
+import banana.pekan.logicsim.component.ComponentRegistry;
 
 import java.awt.*;
 
@@ -21,6 +22,10 @@ public class CustomComponent extends Component {
 
     public CustomComponent get() {
         return new CustomComponent(fileName, getInputPortsNum(), getOutputPortsNum(), (ComponentBoard) Board.loadBoard(fileName, false), componentColor);
+    }
+
+    public Board getAsBoard() {
+        return (Board) Board.loadBoard(fileName, true);
     }
 
 }
