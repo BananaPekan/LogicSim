@@ -3,11 +3,15 @@ package banana.pekan.logicsim.ui;
 import banana.pekan.logicsim.Main;
 import banana.pekan.logicsim.board.Board;
 import banana.pekan.logicsim.component.Component;
+import banana.pekan.logicsim.component.ComponentWriter;
 import banana.pekan.logicsim.component.components.AndComponent;
 import banana.pekan.logicsim.component.components.CustomComponent;
 import banana.pekan.logicsim.component.components.NotComponent;
 
 import java.awt.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class Toolbar {
@@ -17,6 +21,7 @@ public class Toolbar {
     int height = 60;
 
     boolean editing = false;
+    boolean generateFile = false;
 
     Window window;
 
@@ -50,6 +55,11 @@ public class Toolbar {
                     window.green.setValue(componentColor.getGreen());
                     window.blue.setValue(componentColor.getBlue());
                     window.componentNameArea.setText(loadedComponent.getName());
+                    return;
+                }
+                else if (generateFile) {
+                    ComponentWriter componentWriter = new ComponentWriter();
+                    componentWriter.write(loadedComponent, loadedComponent.getName() + ".compbuilder");
                     return;
                 }
                 CustomComponent customComponent = loadedComponent.get();
@@ -99,7 +109,7 @@ public class Toolbar {
 
             int hoverEdit = !mouseOver ? 50 : 100;
 
-            hoverColor = new Color(hoverColor.getRed(), hoverColor.getGreen(), hoverColor.getBlue(), editing ? hoverEdit : (int)button.opaque);
+            hoverColor = new Color(hoverColor.getRed(), hoverColor.getGreen(), hoverColor.getBlue(), (editing || generateFile) ? hoverEdit : (int)button.opaque);
 
             int opaque = (int) button.opaque;
 
@@ -208,11 +218,21 @@ public class Toolbar {
     }
 
     public void startEdit() {
+        generateFile = false;
         editing = true;
     }
 
     public void stopEditing() {
         editing = false;
+    }
+
+    public void startGenerateFile() {
+        editing = false;
+        generateFile = true;
+    }
+
+    public void stopGenerateFile() {
+        generateFile = false;
     }
 
     public interface ClickEvent {

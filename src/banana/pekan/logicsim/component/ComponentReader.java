@@ -1,14 +1,13 @@
 package banana.pekan.logicsim.component;
 
 import banana.pekan.logicsim.board.Board;
-import banana.pekan.logicsim.component.Component;
-import banana.pekan.logicsim.component.Port;
-import banana.pekan.logicsim.component.Wire;
 import banana.pekan.logicsim.component.components.AndComponent;
 import banana.pekan.logicsim.component.components.CustomComponent;
 import banana.pekan.logicsim.component.components.NotComponent;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -30,6 +29,9 @@ public class ComponentReader {
             BufferedReader reader = new BufferedReader(new FileReader(file));
             String line;
             while ((line = reader.readLine()) != null) {
+                if (line.strip().startsWith("//") || line.strip().startsWith("#")) {
+                    continue;
+                }
                 desc += line + "\n";
             }
         } catch (Exception e) {
@@ -42,18 +44,24 @@ public class ComponentReader {
         int outputs = 0;
         String componentName = "";
 
+        float[] color = new float[]{-1, 0, 0, 0};
+
         String[] properties = desc.split("\n");
         for (String property : properties) {
             String[] identifiers = property.split(":");
             String identifier = identifiers[0].strip();
-            if (identifier.equals("name")) {
-                componentName = identifiers[1].strip();
-            }
-            else if (identifier.equals("inputs")) {
-                inputs = Integer.parseInt(identifiers[1].strip());
-            }
-            else if (identifier.equals("outputs")) {
-                outputs = Integer.parseInt(identifiers[1].strip());
+            switch (identifier) {
+                case "name" -> componentName = identifiers[1].strip();
+                case "inputs" -> inputs = Integer.parseInt(identifiers[1].strip());
+                case "outputs" -> outputs = Integer.parseInt(identifiers[1].strip());
+                case "color" -> {
+                    String[] rgb = identifiers[1].strip().replace(" ", "").split(",");
+                    if (rgb.length < 3) return;
+                    color[0] = 0;
+                    color[1] = Integer.parseInt(rgb[0]) / 255f;
+                    color[2] = Integer.parseInt(rgb[1]) / 255f;
+                    color[3] = Integer.parseInt(rgb[2]) / 255f;
+                }
             }
         }
 
@@ -173,7 +181,12 @@ public class ComponentReader {
 
         }
 
-        board.save(componentName + ".component");
+        if (color[0] != -1) {
+            board.save(componentName + ".component", color[1], color[2], color[3], 1);
+        }
+        else {
+            board.save(componentName + ".component");
+        }
 
     }
 

@@ -3,6 +3,7 @@ package banana.pekan.logicsim;
 import banana.pekan.logicsim.board.Board;
 import banana.pekan.logicsim.component.ComponentRegistry;
 import banana.pekan.logicsim.component.ComponentReader;
+import banana.pekan.logicsim.component.ComponentWriter;
 import banana.pekan.logicsim.ui.Window;
 
 import java.io.File;

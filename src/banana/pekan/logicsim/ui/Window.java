@@ -111,6 +111,7 @@ public class Window {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         ObjectValidator shouldEdit = new ObjectValidator(false, false);
+        ObjectValidator shouldGenerateFile = new ObjectValidator(false, false);
 
         panel = new JPanel() {
             @Override
@@ -123,6 +124,15 @@ public class Window {
                 if (!shouldEdit.arePositive() && shouldEdit.hasCycled()) {
                     toolbar.stopEditing();
                 }
+
+                if (shouldGenerateFile.arePositive()) {
+                    toolbar.startGenerateFile();
+                }
+
+                if (!shouldGenerateFile.arePositive() && shouldGenerateFile.hasCycled()) {
+                    toolbar.stopGenerateFile();
+                }
+
 
                 boolean isResizedX = !resizedWidth.doMatch();
                 boolean isResizedY = !resizedHeight.doMatch();
@@ -717,9 +727,13 @@ public class Window {
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
                     shouldEdit.setA(true);
+                    shouldGenerateFile.setA(true);
                 }
                 else if (e.getKeyCode() == KeyEvent.VK_E) {
                     shouldEdit.setB(true);
+                }
+                else if (e.getKeyCode() == KeyEvent.VK_S) {
+                    shouldGenerateFile.setB(true);
                 }
             }
 
@@ -727,9 +741,13 @@ public class Window {
             public void keyReleased(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
                     shouldEdit.setA(false);
+                    shouldGenerateFile.setA(false);
                 }
                 else if (e.getKeyCode() == KeyEvent.VK_E) {
                     shouldEdit.setB(false);
+                }
+                else if (e.getKeyCode() == KeyEvent.VK_S) {
+                    shouldGenerateFile.setB(false);
                 }
             }
         });
